@@ -60,6 +60,8 @@ def expand_rows(row):
 def get_file_path_and_keys(path ,file_name, file_type):
     key = f"{file_name}_{file_type}"
     file_path = f"{path}/{file_name}_{file_type}"
+    file_path += '.xlsx'
+    print("파일 경로 확인:", file_path)
 
     try:
         comment_class_key = parsing_classKey_comment[key]
