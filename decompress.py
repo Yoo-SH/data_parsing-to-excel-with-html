@@ -1,4 +1,4 @@
-import pandas as pd
+import pandas as pd 
 from bs4 import BeautifulSoup
 import logging
 import os
@@ -7,7 +7,7 @@ import platform
 
 
 #엑셀에서 한 cell당 저장할 수 있는 comment_html    1cell당 값이 32000을 넘어서 html파일에 접근하여 그곳에서 parsing해야함.
-#register-data값을 그대로 가져오는 것이 아니라 형식을 변경해서 가져와야함. ex) 24-07-13
+
 
 
 # Set up logging
