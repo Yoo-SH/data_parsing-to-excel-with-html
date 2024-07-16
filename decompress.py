@@ -2,6 +2,8 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import logging
 import os
+import argparse
+
 
 # Set up logging
 logging.basicConfig(filename='decompress.log', level=logging.INFO,
@@ -75,7 +77,6 @@ def expand_rows(row):
 
 def get_file_path_and_keys(path ,file_name, key):
     file_path = f"{path}{file_name}"
-    file_path += '.xlsx'
     
     try:
         comment_class_key = parsing_classKey_comment[key]
@@ -112,10 +113,8 @@ def process_excel_file(input_path, file_name, output_path, output_file_name=None
 
     # 새로운 엑셀 파일로 저장
     if not output_file_name:
-        output_file_name = f"{file_name}_decompress.xlsx"
-    else:
-        if not output_file_name.endswith('.xlsx'):
-            output_file_name += '.xlsx'
+        base_file_name = os.path.splitext(file_name)[0]  # 확장자를 제거한 파일 이름
+        output_file_name = f"{base_file_name}_decompress.xlsx"
             
     output_file_path = f'{output_path}{output_file_name}'
     new_df.to_excel(output_file_path, index=False, columns=['사용여부', 'channel', 'category', 'title', 'detail_content', '종류', 'registered_date', 'site_name', 'board_name'])
@@ -123,7 +122,7 @@ def process_excel_file(input_path, file_name, output_path, output_file_name=None
     print(f"New Excel file saved to {output_file_path}")
 
 def main():
-    file_input = input("input 경로와 파일 이름을 입력하세요 (예:./naver_카페): ")
+    file_input = input("input 경로와 파일 이름을 입력하세요 (예:./naver_카페.xlsx): ")
     input_path, file_name = os.path.split(file_input)
     input_path += '/'
     if not file_name:
@@ -131,7 +130,7 @@ def main():
         return
 
     
-    file_output = input("output 경로와 파일 이름을 입력하세요 (이름 생략 시 기본 decompress로 지정):")
+    file_output = input("output 경로와 파일 이름을 입력하세요 (예:./naver_카페.xlsx, 이름 생략 시 기본 decompress로 지정):")
     output_path , output_file_name =os.path.split(file_output)
     output_path += '/'
     if not output_file_name:
@@ -149,6 +148,8 @@ def main():
 
     print("변환 작업중입니다. 잠시만 기다려주세요...")
     process_excel_file(input_path, file_name, output_path,output_file_name, type)
+
+
 
 if __name__ == "__main__":
     main()
