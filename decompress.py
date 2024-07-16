@@ -7,13 +7,25 @@ import platform
 
 
 #엑셀에서 한 cell당 저장할 수 있는 comment_html    1cell당 값이 32000을 넘어서 html파일에 접근하여 그곳에서 parsing해야함.
+#column값들을 쉽게 다룰 수 있게 따로 변수로 뺴서 가져옴
+#register-data값을 그대로 가져오는 것이 아니라 형식을 변경해서 가져와야함. ex) 24-07-13
+
 
 # Set up logging
 logging.basicConfig(filename='decompress.log', level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-
+# cloumn 값을 지정함.
+column_filed = {
+    1 : 'channel' ,
+    2 : 'title',
+    3 : 'registered_date',
+    4 : 'detail_content',
+    5 : 'comment_html',
+    6 : 'site_name',
+    7 : 'board_name'
+}
 # 각 파일에 대응하는 comment 파싱 키 클래스
 parsing_classKey_comment = {
     'naver_blog': 'u_cbox_contents',
@@ -29,7 +41,8 @@ parsing_classKey_secretComment = {
 }
 
 # 필요한 열만 선택하여 엑셀 파일을 읽어옴
-columns_to_extract = ['channel', 'title', 'registered_date', 'detail_content', 'comment_html', 'site_name', 'board_name']
+columns_to_extract = [column_filed[1], column_filed[2], column_filed[3], column_filed[4], column_filed[5], column_filed[6], column_filed[7]]
+
 
 #comment_html' 열의 HTML 내용을 파싱하여 class 요소의 개수를 추출하는 함수
 def count_elements(html_content, class_name):
