@@ -3,21 +3,21 @@ from bs4 import BeautifulSoup
 
 # 파일명 경로 매핑
 file_paths = {
-    '1234': '../완성예시/1234.xlsx',
+    '1234_카페': '../완성예시/1234.xlsx',
     'naver_카페': '../완성예시/naver_카페.xlsx',
     'naver_지식인': '../완성예시/naver_지식인.xlsx'
 }
 
 # 각 파일에 대응하는 comment 파싱 키 클래스
 parsing_classKey_comment = {
-    '1234': 'u_cbox_contents',
+    '1234_카페': 'u_cbox_contents',
     'naver_카페': 'txt',
     'naver_지식인': 'answerDetail'
 }
 
 # 각 파일에 대응하는 secretComment 파싱 키 클래스
 parsing_classKey_secretComment = {
-    '1234': 'u_cbox_delete_contents',
+    '1234_카페': 'u_cbox_delete_contents',
     'naver_카페': 'not_exit_classKey_1446a54sd15sd67s89456123456789',
     'naver_지식인': 'not_exit_classKey_1446a54sd15sd67s89456123456789'
 }
@@ -73,7 +73,7 @@ def get_file_path_and_keys(file_name, file_type):
         print(f"Error: '{key}'에 대응하는 파일이 존재하지 않습니다.")
         return None, None, None
 
-def process_excel_file(file_name, file_type):
+def process_excel_file(file_name, file_type, output_file_name=None):
     file_path, comment_class_key, secret_comment_class_key = get_file_path_and_keys(file_name, file_type)
     if not file_path:
         return
@@ -97,7 +97,9 @@ def process_excel_file(file_name, file_type):
     new_df['category'] = '회생파산'
 
     # 새로운 엑셀 파일로 저장
-    output_file_path = f'../완성예시/{file_name}_{file_type}_output.xlsx'
+    if not output_file_name:
+        output_file_name = f"{file_name}_{file_type}_decompress.xlsx"
+    output_file_path = f'../완성예시/{output_file_name}'
     new_df.to_excel(output_file_path, index=False, columns=['사용여부', 'channel', 'category', 'title', 'detail_content', '종류', 'registered_date', 'site_name', 'board_name'])
 
     print(f"New Excel file saved to {output_file_path}")
@@ -105,8 +107,16 @@ def process_excel_file(file_name, file_type):
 def main():
     file_name = input("파일 이름을 입력하세요 (예: naver): ")
     file_type = input("파일 종류를 입력하세요 (예: 카페): ")
+    if not file_type:
+        print("Error: 파일 종류를 입력해야 합니다.")
+        return
+
+    output_file_name = input("출력 파일 이름을 입력하세요 (생략 시 기본 이름 사용): ")
+    if not output_file_name:
+        output_file_name = "decompress"
+
     print("변환 작업중입니다. 잠시만 기다려주세요...")
-    process_excel_file(file_name, file_type)
+    process_excel_file(file_name, file_type, output_file_name)
 
 if __name__ == "__main__":
     main()
