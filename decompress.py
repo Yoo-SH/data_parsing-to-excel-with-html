@@ -99,6 +99,10 @@ def process_excel_file(file_name, file_type, output_file_name=None):
     # 새로운 엑셀 파일로 저장
     if not output_file_name:
         output_file_name = f"{file_name}_{file_type}_decompress.xlsx"
+    else:
+        if not output_file_name.endswith('.xlsx'):
+            output_file_name += '.xlsx'
+            
     output_file_path = f'../완성예시/{output_file_name}'
     new_df.to_excel(output_file_path, index=False, columns=['사용여부', 'channel', 'category', 'title', 'detail_content', '종류', 'registered_date', 'site_name', 'board_name'])
 
@@ -111,9 +115,9 @@ def main():
         print("Error: 파일 종류를 입력해야 합니다.")
         return
 
-    output_file_name = input("출력 파일 이름을 입력하세요 (생략 시 기본 이름 사용): ")
+    output_file_name = input("출력 파일 이름을 입력하세요 (생략 시 기본 decompress로 지정): ")
     if not output_file_name:
-        output_file_name = "decompress"
+        output_file_name = None
 
     print("변환 작업중입니다. 잠시만 기다려주세요...")
     process_excel_file(file_name, file_type, output_file_name)
