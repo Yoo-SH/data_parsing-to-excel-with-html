@@ -62,13 +62,20 @@ def expand_rows(row):
             rows.append(new_row)
     return rows
 
-def process_excel_file(file_name):
+def get_file_path_and_keys(file_name, file_type):
+    key = f"{file_name}_{file_type}"
     try:
-        file_path = file_paths[file_name]
-        comment_class_key = parsing_classKey_comment[file_name]
-        secret_comment_class_key = parsing_classKey_secretComment[file_name]
+        file_path = file_paths[key]
+        comment_class_key = parsing_classKey_comment[key]
+        secret_comment_class_key = parsing_classKey_secretComment[key]
+        return file_path, comment_class_key, secret_comment_class_key
     except KeyError:
-        print(f"Error: '{file_name}'에 대응하는 파일이 존재하지 않습니다.")
+        print(f"Error: '{key}'에 대응하는 파일이 존재하지 않습니다.")
+        return None, None, None
+
+def process_excel_file(file_name, file_type):
+    file_path, comment_class_key, secret_comment_class_key = get_file_path_and_keys(file_name, file_type)
+    if not file_path:
         return
 
     df = pd.read_excel(file_path, usecols=columns_to_extract)
@@ -90,16 +97,16 @@ def process_excel_file(file_name):
     new_df['category'] = '회생파산'
 
     # 새로운 엑셀 파일로 저장
-    output_file_path = f'../완성예시/{file_name}_output.xlsx'
+    output_file_path = f'../완성예시/{file_name}_{file_type}_output.xlsx'
     new_df.to_excel(output_file_path, index=False, columns=['사용여부', 'channel', 'category', 'title', 'detail_content', '종류', 'registered_date', 'site_name', 'board_name'])
 
     print(f"New Excel file saved to {output_file_path}")
 
-
 def main():
-    file_name = input("excel 파일 이름을 입력하세요: ")
-    process_excel_file(file_name)
-
+    file_name = input("파일 이름을 입력하세요 (예: naver): ")
+    file_type = input("파일 종류를 입력하세요 (예: 카페): ")
+    print("변환 작업중입니다. 잠시만 기다려주세요...")
+    process_excel_file(file_name, file_type)
 
 if __name__ == "__main__":
     main()
