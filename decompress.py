@@ -3,7 +3,10 @@ from bs4 import BeautifulSoup
 import logging
 import os
 import argparse
+import platform
 
+
+#엑셀에서 한 cell당 저장할 수 있는 comment_html    1cell당 값이 32000을 넘어서 html파일에 접근하여 그곳에서 parsing해야함.
 
 # Set up logging
 logging.basicConfig(filename='decompress.log', level=logging.INFO,
@@ -128,17 +131,33 @@ def main():
     parser.add_argument('-type', required=True, help='파일 종류 (예: naver_blog)')
     args = parser.parse_args()
 
-    input_path, file_name = os.path.split(args.input)
-    input_path += '/'
+    input_path, input_file_name = os.path.split(args.input)
     output_path, output_file_name = os.path.split(args.output)
-    output_path += '/'
+    
+    
+    
+    if  os.path.isabs(input_path) and platform.system() == "Windows":  #상대경로가 아니라면
+        print("input_path가 절대경로 입니다. input_path: "  + str(input_path))
+        input_path += '\\'
+    else:
+        input_path += '/'
+    
 
-    if not file_name:
+    if  os.path.isabs(output_path) and  platform.system() == "Windows":  #상대경로가 아니라면
+        print("output_path가 절대경로 입니다. output_path: "  + str(output_path))
+        output_path += '\\'        
+    else:
+        output_path += '/' 
+
+
+
+    if not input_file_name:
         print("Error: 파일 이름을 입력해야 합니다.")
         return
 
     if not output_file_name: #output file명을 입력하지 않으면, _decompress이름이 붙은 파일이 생성.
         output_file_name = None
+
 
     if not args.type:
         print("Error: 파일 종류를 입력해야 합니다.")
@@ -148,7 +167,7 @@ def main():
     print("파일 출력 경로 확인:", output_path)
 
     print("변환 작업중입니다. 잠시만 기다려주세요...")
-    process_excel_file(input_path, file_name, output_path, output_file_name, args.type)
+    process_excel_file(input_path, input_file_name, output_path, output_file_name, args.type)
 
 if __name__ == "__main__":
     main()
