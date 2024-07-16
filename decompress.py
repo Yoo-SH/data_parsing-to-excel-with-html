@@ -1,11 +1,10 @@
 import pandas as pd
 from bs4 import BeautifulSoup
+import logging
 
 # Set up logging
 logging.basicConfig(filename='decompress.log', level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
-
-#class key를 type에 따라 만들도록 하기.
 
 
 
@@ -20,23 +19,24 @@ parsing_classKey_comment = {
 parsing_classKey_secretComment = {
     'naver_blog': 'u_cbox_delete_contents',
     'naver_cafe': 'not_exit_classKey_1446a54sd15sd67s89456123456789',
-    'naver_blog': 'not_exit_classKey_1446a54sd15sd67s89456123456789'
+    'naver_kin': 'not_exit_classKey_1446a54sd15sd67s89456123456789'
 }
 
 # 필요한 열만 선택하여 엑셀 파일을 읽어옴
 columns_to_extract = ['channel', 'title', 'registered_date', 'detail_content', 'comment_html', 'site_name', 'board_name']
 
+#comment_html' 열의 HTML 내용을 파싱하여 class 요소의 개수를 추출하는 함수
 def count_elements(html_content, class_name):
-    """'comment_html' 열의 HTML 내용을 파싱하여 class 요소의 개수를 추출하는 함수"""
+    
     if pd.isna(html_content):  # 셀이 비어 있는 경우 처리
         return 0
     soup = BeautifulSoup(html_content, 'lxml')
     elements = soup.find_all(class_=class_name)
     return len(elements)
 
-
+#comment_html 열의 HTML 내용을 파싱하여 comment_texts를 추출하는 함수
 def extract_contents(html_content, class_name):
-    """'comment_html' 열의 HTML 내용을 파싱하여 comment_texts를 추출하는 함수"""
+    
     
     if pd.isna(html_content):  # 셀이 비어 있는 경우 처리
         return []
@@ -50,9 +50,9 @@ def extract_contents(html_content, class_name):
         logging.exception("Traceback:")  # Log the full stack trace
         return []
 
-
+#commentN'의 갯수+1 행을 복제하면서 첫 번째 행은 detail_content를 유지하고 나머지는 comment_texts 텍스트를 채우는 함수
 def expand_rows(row):
-    """'commentN'의 갯수+1 행을 복제하면서 첫 번째 행은 detail_content를 유지하고 나머지는 comment_texts 텍스트를 채우는 함수"""
+    
     rows = []
     repeat_count = row['commentN']  # comment의 갯수만큼 row 생성
     if repeat_count > 0:
@@ -72,8 +72,8 @@ def expand_rows(row):
             rows.append(new_row)
     return rows
 
-def get_file_path_and_keys(path ,file_name, file_type, key):
-    file_path = f"{path}{file_name}_{file_type}"
+def get_file_path_and_keys(path ,file_name, key):
+    file_path = f"{path}{file_name}"
     file_path += '.xlsx'
     print("파일 경로 확인:", file_path)
 
@@ -86,8 +86,8 @@ def get_file_path_and_keys(path ,file_name, file_type, key):
         return None, None, None
 
 
-def process_excel_file(input_path, file_name, file_type, output_path,output_file_name=None, type=None):
-    file_path, comment_class_key, secret_comment_class_key = get_file_path_and_keys(input_path , file_name, file_type ,type)
+def process_excel_file(input_path, file_name, output_path,output_file_name=None, type=None):
+    file_path, comment_class_key, secret_comment_class_key = get_file_path_and_keys(input_path , file_name ,type)
     if not file_path:
         return
 
@@ -111,7 +111,7 @@ def process_excel_file(input_path, file_name, file_type, output_path,output_file
 
     # 새로운 엑셀 파일로 저장
     if not output_file_name:
-        output_file_name = f"{file_name}_{file_type}_decompress.xlsx"
+        output_file_name = f"{file_name}_decompress.xlsx"
     else:
         if not output_file_name.endswith('.xlsx'):
             output_file_name += '.xlsx'
@@ -124,8 +124,7 @@ def process_excel_file(input_path, file_name, file_type, output_path,output_file
 def main():
     input_path =input("파일 찾을 경로지정(예:./)")
     file_name = input("파일 이름을 입력하세요 (예: naver): ")
-    file_type = input("파일 종류를 입력하세요 (예: 카페): ")
-    if not file_type:
+    if not file_name:
         print("Error: 파일 종류를 입력해야 합니다.")
         return
 
@@ -142,7 +141,7 @@ def main():
 
 
     print("변환 작업중입니다. 잠시만 기다려주세요...")
-    process_excel_file(input_path, file_name, file_type, output_path,output_file_name, type)
+    process_excel_file(input_path, file_name, output_path,output_file_name, type)
 
 if __name__ == "__main__":
     main()
