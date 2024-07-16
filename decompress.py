@@ -1,12 +1,7 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 
-# 파일명 경로 매핑
-file_paths = {
-    '1234_카페': '../완성예시/1234.xlsx',
-    'naver_카페': '../완성예시/naver_카페.xlsx',
-    'naver_지식인': '../완성예시/naver_지식인.xlsx'
-}
+
 
 # 각 파일에 대응하는 comment 파싱 키 클래스
 parsing_classKey_comment = {
@@ -62,10 +57,11 @@ def expand_rows(row):
             rows.append(new_row)
     return rows
 
-def get_file_path_and_keys(file_name, file_type):
+def get_file_path_and_keys(path ,file_name, file_type):
     key = f"{file_name}_{file_type}"
+    file_path = f"{path}/{file_name}_{file_type}"
+
     try:
-        file_path = file_paths[key]
         comment_class_key = parsing_classKey_comment[key]
         secret_comment_class_key = parsing_classKey_secretComment[key]
         return file_path, comment_class_key, secret_comment_class_key
@@ -73,8 +69,9 @@ def get_file_path_and_keys(file_name, file_type):
         print(f"Error: '{key}'에 대응하는 파일이 존재하지 않습니다.")
         return None, None, None
 
-def process_excel_file(file_name, file_type, output_file_name=None):
-    file_path, comment_class_key, secret_comment_class_key = get_file_path_and_keys(file_name, file_type)
+
+def process_excel_file(path, file_name, file_type, output_file_name=None):
+    file_path, comment_class_key, secret_comment_class_key = get_file_path_and_keys(path , file_name, file_type)
     if not file_path:
         return
 
@@ -103,12 +100,13 @@ def process_excel_file(file_name, file_type, output_file_name=None):
         if not output_file_name.endswith('.xlsx'):
             output_file_name += '.xlsx'
             
-    output_file_path = f'../완성예시/{output_file_name}'
+    output_file_path = f'{path}/{output_file_name}'
     new_df.to_excel(output_file_path, index=False, columns=['사용여부', 'channel', 'category', 'title', 'detail_content', '종류', 'registered_date', 'site_name', 'board_name'])
 
     print(f"New Excel file saved to {output_file_path}")
 
 def main():
+    path =input("경로지정(예:.)")
     file_name = input("파일 이름을 입력하세요 (예: naver): ")
     file_type = input("파일 종류를 입력하세요 (예: 카페): ")
     if not file_type:
@@ -120,7 +118,7 @@ def main():
         output_file_name = None
 
     print("변환 작업중입니다. 잠시만 기다려주세요...")
-    process_excel_file(file_name, file_type, output_file_name)
+    process_excel_file(path, file_name, file_type, output_file_name)
 
 if __name__ == "__main__":
     main()
