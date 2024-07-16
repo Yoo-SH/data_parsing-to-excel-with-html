@@ -59,7 +59,7 @@ def expand_rows(row):
 
 def get_file_path_and_keys(path ,file_name, file_type):
     key = f"{file_name}_{file_type}"
-    file_path = f"{path}/{file_name}_{file_type}"
+    file_path = f"{path}{file_name}_{file_type}"
     file_path += '.xlsx'
     print("파일 경로 확인:", file_path)
 
@@ -72,8 +72,8 @@ def get_file_path_and_keys(path ,file_name, file_type):
         return None, None, None
 
 
-def process_excel_file(path, file_name, file_type, output_file_name=None):
-    file_path, comment_class_key, secret_comment_class_key = get_file_path_and_keys(path , file_name, file_type)
+def process_excel_file(input_path, file_name, file_type, output_path,output_file_name=None):
+    file_path, comment_class_key, secret_comment_class_key = get_file_path_and_keys(input_path , file_name, file_type)
     if not file_path:
         return
 
@@ -102,25 +102,26 @@ def process_excel_file(path, file_name, file_type, output_file_name=None):
         if not output_file_name.endswith('.xlsx'):
             output_file_name += '.xlsx'
             
-    output_file_path = f'{path}/{output_file_name}'
+    output_file_path = f'{output_path}{output_file_name}'
     new_df.to_excel(output_file_path, index=False, columns=['사용여부', 'channel', 'category', 'title', 'detail_content', '종류', 'registered_date', 'site_name', 'board_name'])
 
     print(f"New Excel file saved to {output_file_path}")
 
 def main():
-    path =input("경로지정(예:.)")
+    input_path =input("파일 찾을 경로지정(예:./)")
     file_name = input("파일 이름을 입력하세요 (예: naver): ")
     file_type = input("파일 종류를 입력하세요 (예: 카페): ")
     if not file_type:
         print("Error: 파일 종류를 입력해야 합니다.")
         return
 
+    output_path = input("출력경로를 지정")
     output_file_name = input("출력 파일 이름을 입력하세요 (생략 시 기본 decompress로 지정): ")
     if not output_file_name:
         output_file_name = None
 
     print("변환 작업중입니다. 잠시만 기다려주세요...")
-    process_excel_file(path, file_name, file_type, output_file_name)
+    process_excel_file(input_path, file_name, file_type, output_path,output_file_name)
 
 if __name__ == "__main__":
     main()
