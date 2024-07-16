@@ -122,34 +122,33 @@ def process_excel_file(input_path, file_name, output_path, output_file_name=None
     print(f"New Excel file saved to {output_file_path}")
 
 def main():
-    file_input = input("input 경로와 파일 이름을 입력하세요 (예:./naver_카페.xlsx): ")
-    input_path, file_name = os.path.split(file_input)
+    parser = argparse.ArgumentParser(description='Process Excel file.')
+    parser.add_argument('-input', required=True, help='input 경로와 파일 이름 (예: ./inputexcelfile.xlsx)')
+    parser.add_argument('-output', required=True, help='output 경로와 파일 이름 (예: ./outputexcelfile.xlsx)')
+    parser.add_argument('-type', required=True, help='파일 종류 (예: naver_blog)')
+    args = parser.parse_args()
+
+    input_path, file_name = os.path.split(args.input)
     input_path += '/'
+    output_path, output_file_name = os.path.split(args.output)
+    output_path += '/'
+
     if not file_name:
         print("Error: 파일 이름을 입력해야 합니다.")
         return
 
-    
-    file_output = input("output 경로와 파일 이름을 입력하세요 (예:./naver_카페.xlsx, 이름 생략 시 기본 decompress로 지정):")
-    output_path , output_file_name =os.path.split(file_output)
-    output_path += '/'
-    if not output_file_name:
+    if not output_file_name: #output file명을 입력하지 않으면, _decompress이름이 붙은 파일이 생성.
         output_file_name = None
-    
-    type = input("타입을 입력하세요.")
-    if not type:
+
+    if not args.type:
         print("Error: 파일 종류를 입력해야 합니다.")
         return
-    
+
     print("파일 입력 경로 확인:", input_path)
     print("파일 출력 경로 확인:", output_path)
 
-
-
     print("변환 작업중입니다. 잠시만 기다려주세요...")
-    process_excel_file(input_path, file_name, output_path,output_file_name, type)
-
-
+    process_excel_file(input_path, file_name, output_path, output_file_name, args.type)
 
 if __name__ == "__main__":
     main()
