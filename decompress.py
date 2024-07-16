@@ -7,7 +7,6 @@ import platform
 
 
 #엑셀에서 한 cell당 저장할 수 있는 comment_html    1cell당 값이 32000을 넘어서 html파일에 접근하여 그곳에서 parsing해야함.
-#column값들을 쉽게 다룰 수 있게 따로 변수로 뺴서 가져옴
 #register-data값을 그대로 가져오는 것이 아니라 형식을 변경해서 가져와야함. ex) 24-07-13
 
 
@@ -26,6 +25,8 @@ column_filed = {
     6 : 'site_name',
     7 : 'board_name'
 }
+
+
 # 각 파일에 대응하는 comment 파싱 키 클래스
 parsing_classKey_comment = {
     'naver_blog': 'u_cbox_contents',
@@ -116,6 +117,10 @@ def process_excel_file(input_path, file_name, output_path, output_file_name=None
     df['commentN'] = df['comment_class_key'] + df['secret_comment_class_key']
     # 'comment_html' 열에서 comment_class_key 텍스트를 추출하여 새로운 열에 저장합니다
     df['comment_texts'] = df['comment_html'].apply(lambda x: extract_contents(x, comment_class_key))
+
+    # registered_date 값 형식 변경
+    df['registered_date'] = pd.to_datetime(df['registered_date'], errors='coerce').dt.strftime('%d-%m-%y')
+    
 
     # 새로운 데이터프레임 생성
     expanded_rows = []
