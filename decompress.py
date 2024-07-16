@@ -1,6 +1,7 @@
 import pandas as pd
 from bs4 import BeautifulSoup
 import logging
+import os
 
 # Set up logging
 logging.basicConfig(filename='decompress.log', level=logging.INFO,
@@ -75,8 +76,7 @@ def expand_rows(row):
 def get_file_path_and_keys(path ,file_name, key):
     file_path = f"{path}{file_name}"
     file_path += '.xlsx'
-    print("파일 경로 확인:", file_path)
-
+    
     try:
         comment_class_key = parsing_classKey_comment[key]
         secret_comment_class_key = parsing_classKey_secretComment[key]
@@ -86,10 +86,11 @@ def get_file_path_and_keys(path ,file_name, key):
         return None, None, None
 
 
-def process_excel_file(input_path, file_name, output_path,output_file_name=None, type=None):
+def process_excel_file(input_path, file_name, output_path, output_file_name=None, type=None):
     file_path, comment_class_key, secret_comment_class_key = get_file_path_and_keys(input_path , file_name ,type)
     if not file_path:
         return
+    
 
     df = pd.read_excel(file_path, usecols=columns_to_extract)
     # comment의 갯수를 계산하기 위해 열에 대해 count_elements 함수를 적용하여 새로운 열에 저장합니다
@@ -122,14 +123,17 @@ def process_excel_file(input_path, file_name, output_path,output_file_name=None,
     print(f"New Excel file saved to {output_file_path}")
 
 def main():
-    input_path =input("파일 찾을 경로지정(예:./)")
-    file_name = input("파일 이름을 입력하세요 (예: naver): ")
+    file_input = input("input 경로와 파일 이름을 입력하세요 (예:./naver_카페): ")
+    input_path, file_name = os.path.split(file_input)
+    input_path += '/'
     if not file_name:
-        print("Error: 파일 종류를 입력해야 합니다.")
+        print("Error: 파일 이름을 입력해야 합니다.")
         return
 
-    output_path = input("출력경로를 지정")
-    output_file_name = input("출력 파일 이름을 입력하세요 (생략 시 기본 decompress로 지정): ")
+    
+    file_output = input("output 경로와 파일 이름을 입력하세요 (이름 생략 시 기본 decompress로 지정):")
+    output_path , output_file_name =os.path.split(file_output)
+    output_path += '/'
     if not output_file_name:
         output_file_name = None
     
@@ -138,6 +142,9 @@ def main():
         print("Error: 파일 종류를 입력해야 합니다.")
         return
     
+    print("파일 입력 경로 확인:", input_path)
+    print("파일 출력 경로 확인:", output_path)
+
 
 
     print("변환 작업중입니다. 잠시만 기다려주세요...")
