@@ -1,21 +1,22 @@
-import pandas as pd 
+import pandas as pd
 from bs4 import BeautifulSoup
 import logging
 import os
 import argparse
 import platform
+import requests
+
 
 
 #엑셀에서 한 cell당 저장할 수 있는 comment_html    1cell당 값이 32000을 넘어서 html파일에 접근하여 그곳에서 parsing해야함.
 
 
-
 # Set up logging
-logging.basicConfig(filename='decompress.log', level=logging.INFO,
+logging.basicConfig(filename='parsing_link_test.log', level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-# cloumn 값을 지정함.
+# 가공할 cloumn filed 값을 지정함.
 column_filed = {
     1 : 'channel' ,
     2 : 'title',
@@ -53,6 +54,19 @@ def count_elements(html_content, class_name):
     soup = BeautifulSoup(html_content, 'lxml')
     elements = soup.find_all(class_=class_name)
     return len(elements)
+
+# HTML 파일을 다운로드하는 함수
+def download_html_file(url, download_path):
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        with open(download_path, 'wb') as file:
+            file.write(response.content)
+        return download_path
+    except requests.RequestException as e:
+        logging.error(f"Error downloading file from {url}: {e}")
+        return None
+    
 
 #comment_html 열의 HTML 내용을 파싱하여 comment_texts를 추출하는 함수
 def extract_contents(html_content, class_name):
@@ -115,6 +129,7 @@ def process_excel_file(input_path, file_name, output_path, output_file_name=None
     df['comment_class_key'] = df['comment_html'].apply(lambda x: count_elements(x, comment_class_key))
     df['secret_comment_class_key'] = df['comment_html'].apply(lambda x: count_elements(x, secret_comment_class_key))
     df['commentN'] = df['comment_class_key'] + df['secret_comment_class_key']
+
     # 'comment_html' 열에서 comment_class_key 텍스트를 추출하여 새로운 열에 저장합니다
     df['comment_texts'] = df['comment_html'].apply(lambda x: extract_contents(x, comment_class_key))
 
